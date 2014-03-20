@@ -32,18 +32,20 @@ public:
     ofQTKitPlayer rtsp;
     ofImage thresholded;
     ofPixels rtspPix;
+    ofPixels threshPix;
     ofxCv::RunningBackground background;
     
     ofxPanel gui;
     ofxIntSlider backgroundThresh;
     ofxIntSlider learningTime;
     ofxButton reset;
-    ofxToggle bShowGrid;
+    ofxButton bGetPix;
+    ofxToggle bGetValues;
     int boxSize;
     
     
     bool bIsSetting;
-    bool bGetPix;
+   // bool bGetPix;
     
     static const int numLEDs = 10;
     

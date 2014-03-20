@@ -125,6 +125,8 @@ void sampleCell::draw(int alphaCoeff){
     
     ofSetColor(0, 255, 0);
     shape.draw();
+    ofDrawBitmapString(ofToString(average), shape.getCentroid2D().x, shape.getCentroid2D().y);
+    
     
 }
 
@@ -140,7 +142,7 @@ void sampleCell::reset(){
 
 //--------------------------------------------------------------
 void sampleCell::getPixLocations(const ofPixels &_pix, ofPoint _startPoint){
-    ofPixels pix = _pix;
+    pix = _pix;
     int startX = _startPoint.x;
     int startY = _startPoint.y;
     
@@ -160,15 +162,19 @@ void sampleCell::getPixLocations(const ofPixels &_pix, ofPoint _startPoint){
 }
 
 //--------------------------------------------------------------
-int sampleCell::getCellAvg(){
+int sampleCell::getCellAvg(const ofPixels &_pix){
+    pix = _pix;
     
     for(int i = 0; i < pixIn.size(); i++)
     {
-        total = total + pixIn[i];
+        //ofLogVerbose() << "cell: " << ID << ", Value of pixel " << pixIn[i] << ": " << (int)pix[pixIn[i]];
+        
+        total = total + (int)pix[pixIn[i]];
     }
     
-    int average = total / pixIn.size();
+    average = total / pixIn.size();
     total = 0;
+    ofLogVerbose() << "average of cell " << ID << ": " << average;
     return average;
 }
 

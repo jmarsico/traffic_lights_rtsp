@@ -11,9 +11,11 @@ void testApp::setup(){
     gui.add(backgroundThresh.setup("bgThresh", 21, 0, 255));
     gui.add(learningTime.setup("learnTime", 50, 30, 2000));
     gui.add(reset.setup("reset background"));
-    gui.setPosition(10, ofGetHeight() - 200);
+    gui.add(bGetPix.setup("get pixel indices"));
+    gui.add(bGetValues.setup("get values", false));
+    gui.setPosition(330, 290);
     
-    boxSize = 10;
+    boxSize = 40;
     
     
     
@@ -38,7 +40,7 @@ void testApp::setup(){
     }
     
     bIsSetting = true;
-    bGetPix = false;
+   // bGetPix = false;
     
     background.setLearningTime(50);
     background.setThresholdValue(200);
@@ -77,6 +79,7 @@ void testApp::update(){
         rtspPix = rtsp.getPixelsRef();
         background.update(rtspPix, thresholded);
         thresholded.update();
+        threshPix = thresholded.getPixelsRef();
         
         
     }
@@ -85,10 +88,18 @@ void testApp::update(){
         for(int i = 0; i < numLEDs; i++)
         {
             ofPoint start;
-            start.set(0,0);
-            cells[i].getPixLocations(rtspPix, start);
+            start.set(rtsp.getWidth()+10,0);
+            cells[i].getPixLocations(threshPix, start);
         }
-        bGetPix = false;
+        
+    }
+    
+    if(bGetValues)
+    {
+        for(int i = 0; i < numLEDs; i++)
+        {
+           brights[i] = cells[i].getCellAvg(threshPix);
+        }
     }
 }
 
@@ -113,8 +124,8 @@ void testApp::draw(){
     ofPopMatrix();
     
     ofPushMatrix();
-    ofTranslate(rtsp.getWidth()+10, 0);
-    thresholded.draw(0,0);
+        ofTranslate(rtsp.getWidth()+10, 0);
+        thresholded.draw(0,0);
     ofPopMatrix();
     
     //draw boxes
@@ -126,6 +137,7 @@ void testApp::draw(){
                 ofTranslate(boxSize*i, ofGetHeight()/2 - boxSize);
                 ofSetColor(brights[i]);
                 ofRect(0,0,boxSize, boxSize);
+                ofSetColor(255);
                 ofDrawBitmapString(ofToString(i), 0,0);
             ofPopMatrix();
             
@@ -149,9 +161,7 @@ void testApp::keyPressed(int key){
         }
     }
     
-    if(key == 'k'){
-        bGetPix = true;
-    }
+    
 
 }
 

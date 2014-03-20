@@ -31,8 +31,9 @@ public:
     bool isPointsSet();
     bool isSettingPoints();
     
-    int getCellAvg();
+    int getCellAvg(const ofPixels &_pix);
     int total;
+    ofPixels pix;
     
     void getPixLocations(const ofPixels &_pix, ofPoint _startPoint);
     
@@ -48,7 +49,7 @@ protected:
     bool bRegisteredEvents;
     bool bIsSet;
     int increment;
-    
+    int average;
     int alpha;
     void addPoint();
     bool secondSet;
