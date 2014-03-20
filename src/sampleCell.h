@@ -31,6 +31,9 @@ public:
     bool isPointsSet();
     bool isSettingPoints();
     
+    int getCellAvg();
+    int total;
+    
     void getPixLocations(const ofPixels &_pix, ofPoint _startPoint);
     
     void mouseMoved(ofMouseEventArgs & args);

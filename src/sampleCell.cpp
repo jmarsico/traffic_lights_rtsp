@@ -17,6 +17,7 @@ void sampleCell::init(int _ID){
     increment = 0;
     ofLogVerbose() << "cell initialized";
     ID = _ID;
+    total = 0;
 }
 
 
@@ -156,6 +157,19 @@ void sampleCell::getPixLocations(const ofPixels &_pix, ofPoint _startPoint){
     }
     
     ofLogVerbose() << "num of pix in: " << ID <<  " pixIn: " << pixIn.size();
+}
+
+//--------------------------------------------------------------
+int sampleCell::getCellAvg(){
+    
+    for(int i = 0; i < pixIn.size(); i++)
+    {
+        total = total + pixIn[i];
+    }
+    
+    int average = total / pixIn.size();
+    total = 0;
+    return average;
 }
 
 //--------------------------------------------------------------

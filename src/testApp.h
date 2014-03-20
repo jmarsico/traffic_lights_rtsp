@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-//#include "ofxCv.h"
+#include "ofxCv.h"
 #include "ofxGui.h"
 #include "ofEvents.h"
 #include "sampleCell.h"
@@ -30,9 +30,14 @@ public:
     vector <int> brights;
     
     ofQTKitPlayer rtsp;
+    ofImage thresholded;
     ofPixels rtspPix;
+    ofxCv::RunningBackground background;
     
     ofxPanel gui;
+    ofxIntSlider backgroundThresh;
+    ofxIntSlider learningTime;
+    ofxButton reset;
     ofxToggle bShowGrid;
     int boxSize;
     

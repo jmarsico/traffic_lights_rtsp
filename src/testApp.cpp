@@ -8,6 +8,9 @@ void testApp::setup(){
 
     
     gui.setup();
+    gui.add(backgroundThresh.setup("bgThresh", 21, 0, 255));
+    gui.add(learningTime.setup("learnTime", 50, 30, 2000));
+    gui.add(reset.setup("reset background"));
     gui.setPosition(10, ofGetHeight() - 200);
     
     boxSize = 10;
@@ -37,11 +40,21 @@ void testApp::setup(){
     bIsSetting = true;
     bGetPix = false;
     
+    background.setLearningTime(50);
+    background.setThresholdValue(200);
+    
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
     
+    background.setLearningTime(learningTime);
+    background.setThresholdValue(backgroundThresh);
+    
+    if(reset)
+    {
+        background.reset();
+    }
     
     if(!cells[0].isPointsSet() && !cells[0].isSettingPoints()){
         cells[0].setPointsFirst();
@@ -60,7 +73,11 @@ void testApp::update(){
         
     rtsp.update();
     if(rtsp.isFrameNew()){
+        
         rtspPix = rtsp.getPixelsRef();
+        background.update(rtspPix, thresholded);
+        thresholded.update();
+        
         
     }
     
@@ -95,6 +112,10 @@ void testApp::draw(){
 
     ofPopMatrix();
     
+    ofPushMatrix();
+    ofTranslate(rtsp.getWidth()+10, 0);
+    thresholded.draw(0,0);
+    ofPopMatrix();
     
     //draw boxes
     ofPushMatrix();
