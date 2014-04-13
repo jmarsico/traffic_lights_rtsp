@@ -1,0 +1,9 @@
+<group>
+	<bgThresh>21</bgThresh>
+	<learnTime>50</learnTime>
+	<ready>0</ready>
+	<Link_Cells>1</Link_Cells>
+	<boxSize>91</boxSize>
+	<use_this_camera>0</use_this_camera>
+<group/>
+</group>

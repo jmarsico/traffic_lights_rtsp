@@ -14,7 +14,9 @@
 
 class sampleCell{
 public:
-    ofPoint p0, p1, p2, p3, tempPoint;
+    vector <ofPoint> p;
+    //p0, p1, p2, p3, tempPoint;
+    ofPoint tempPoint;
     vector <int> pixIn;
     int redVal;
     ofPolyline shape;
@@ -24,18 +26,22 @@ public:
     
     void init(int _ID);
     
-    void setPoints(ofPoint oldP0, ofPoint oldP1);
-    void setPointsFirst();
+    void setPoints(ofPoint oldP0, ofPoint oldP1, const ofPixels &_pix, ofPoint _startPoint);
+    void setPointsFirst(const ofPixels &_pix, ofPoint _startPoint);
     void draw(int alphaCoeff);
     void reset();
     bool isPointsSet();
     bool isSettingPoints();
+    void addPoint();
     
     int getCellAvg(const ofPixels &_pix);
     int total;
     ofPixels pix;
+    int startX;
+    int startY;
+    bool bSettingPoints;
     
-    void getPixLocations(const ofPixels &_pix, ofPoint _startPoint);
+    void getPixLocations();
     
     void mouseMoved(ofMouseEventArgs & args);
     void mouseDragged(ofMouseEventArgs & args);
@@ -45,13 +51,12 @@ public:
     
     
 protected:
-    bool bSettingPoints;
+    
     bool bRegisteredEvents;
     bool bIsSet;
     int increment;
     int average;
     int alpha;
-    void addPoint();
     bool secondSet;
 };
 

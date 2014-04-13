@@ -5,6 +5,7 @@
 #include "ofxGui.h"
 #include "ofEvents.h"
 #include "sampleCell.h"
+#include "ofxXmlSettings.h"
 
 
 class testApp : public ofBaseApp{
@@ -24,32 +25,45 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
 
+    void loadCellsFromXml();
+    void saveCellsToXml();
 
     //ofVideoGrabber grabber;
     //ofImage greyImage;
     vector <int> brights;
     
     ofQTKitPlayer rtsp;
-    ofImage thresholded;
     ofPixels rtspPix;
-    ofPixels threshPix;
+  
     ofxCv::RunningBackground background;
+    ofImage thresholded;
+    ofPixels threshPix;
+    
+    ofVideoGrabber grabber;
+    ofPixels grabPix;
+    
     
     ofxPanel gui;
+    ofxButton bLoadCells;
+    ofxButton bSaveCells;
     ofxIntSlider backgroundThresh;
     ofxIntSlider learningTime;
     ofxButton reset;
-    ofxButton bGetPix;
-    ofxToggle bGetValues;
-    int boxSize;
+    ofxToggle bReady;
+    ofxToggle bLinkCells;
+    ofxToggle bUseLocalVid;
+    ofxIntSlider boxSize;
     
     
     bool bIsSetting;
+    bool bShowVideo;
    // bool bGetPix;
     
     static const int numLEDs = 10;
     
     //states
     sampleCell cells[numLEDs];
+    
+    ofxXmlSettings myXML;
 
 };

@@ -10,11 +10,11 @@
 
 sampleCell::sampleCell(){}
 
+//--------------------------------------------------------------
 void sampleCell::init(int _ID){
     bSettingPoints = false;
     bRegisteredEvents = false;
     bIsSet = false;
-    increment = 0;
     ofLogVerbose() << "cell initialized";
     ID = _ID;
     total = 0;
@@ -22,91 +22,107 @@ void sampleCell::init(int _ID){
 
 
 //--------------------------------------------------------------
-void sampleCell::addPoint(){
+void sampleCell::setPoints(ofPoint oldP0, ofPoint oldP1, const ofPixels &_pix, ofPoint _startPoint)
+{
+    
+    pix = _pix;
+    startX = _startPoint.x;
+    startY = _startPoint.y;
+    bSettingPoints = true;
+    if(!bRegisteredEvents) {
+        ofRegisterMouseEvents(this); // this will enable our circle class to listen to the mouse events.
+        bRegisteredEvents = true;
+    }
+   
+    p.push_back(oldP0);
+    p.push_back(oldP1);
+    shape.addVertex(p[0]);
+    shape.addVertex(p[1]);
+    
+    ofLog() << "*************************************************";
+    ofLogVerbose() << "setPoints " << ID << " started with two points";
+    ofLogVerbose() << "cell[" << ID << "] p[0] is: " << p[0].x << " " << p[0].y;
+    ofLogVerbose() << "cell[" << ID << "] p[1] is: " << p[1].x << " " << p[1].y;
 
+}
+
+//--------------------------------------------------------------
+void sampleCell::setPointsFirst(const ofPixels &_pix, ofPoint _startPoint){
+    pix = _pix;
+    startX = _startPoint.x;
+    startY = _startPoint.y;
+    bSettingPoints = true;
+    if(!bRegisteredEvents) {
+        ofRegisterMouseEvents(this); // this will enable our circle class to listen to the mouse events.
+        bRegisteredEvents = true;
+    }
+    ofLog() << "*************************************************";
+    ofLogVerbose() << "setPoints " << ID << " started empty";
+    ofLogVerbose() << "cell[" << ID << "] has pix: " << pix.size();
+}
+
+//--------------------------------------------------------------
+void sampleCell::addPoint(){
+    
     if(bSettingPoints == true)
     {
-        ofLogVerbose() << "cell: " << ID << " increment is: " << increment;
-        
-        if(increment == 0)
+        if(p.size() == 0)
         {
-            p0.x = tempPoint.x;
-            p0.y = tempPoint.y;
-            shape.addVertex(p0);
-        
-            ofLogVerbose() << "cell: " << ID << " point 0 is: " << p0.x << " " << p0.y;
+            ofPoint temp;
+            temp.x = tempPoint.x;
+            temp.y = tempPoint.y;
+            p.push_back(temp);
+            shape.addVertex(p[0]);
+            
+            ofLogVerbose() << "cell[" << ID << "] point[0] is: " << p[0].x << " " << p[0].x;
             
         }
-        if(increment == 1)
+        else if(p.size() == 1)
         {
-            p1.x = tempPoint.x;
-            p1.y = tempPoint.y;
-            shape.addVertex(p1);
+            ofPoint temp;
+            temp.x = tempPoint.x;
+            temp.y = tempPoint.y;
+            p.push_back(temp);
+            shape.addVertex(p[1]);
             
-            ofLogVerbose() << "cell: " << ID << " point 1 is: " << p1.x << " " << p1.y;
+            ofLogVerbose() << "cell[" << ID << "] point[1] is: " << p[1].x << " " << p[1].y;
         }
-        if(increment == 2)
+        else if(p.size() == 2)
         {
-            p2.x = tempPoint.x;
-            p2.y = tempPoint.y;
-            shape.addVertex(p2);
+            ofPoint temp;
+            temp.x = tempPoint.x;
+            temp.y = tempPoint.y;
+            p.push_back(temp);
+            shape.addVertex(p[2]);
             
-            ofLogVerbose() << "cell: " << ID << " point 2 is: " << p2.x << " " << p2.y;
+            ofLogVerbose() << "cell[" << ID << "] point[2] is: " << p[2].x << " " << p[2].y;
         }
-        if(increment == 3)
+        else if(p.size() == 3)
         {
-            p3.x = tempPoint.x;
-            p3.y = tempPoint.y;
-            shape.addVertex(p3);
+            ofPoint temp;
+            temp.x = tempPoint.x;
+            temp.y = tempPoint.y;
+            p.push_back(temp);
+            shape.addVertex(p[3]);
             shape.close();
             bSettingPoints = false;
             bIsSet = true;
             
-            ofLogVerbose() << "cell: " << ID << " point 3 is: " << p3.x << " " << p3.y;
+            ofLogVerbose() << "cell[" << ID << "] point[3] is: " << p[3].x << " " << p[3].y;
             ofLogVerbose() << "bIsSet is true";
             ofUnregisterMouseEvents(this);
         }
-        increment ++;
-        ofLogVerbose() << "cell: " << ID << " increment is: " << increment;
+        if(bIsSet)
+        {
+            getPixLocations();
+            
+        }
+        
     }
-
-
+    
+    
 }
 
-//--------------------------------------------------------------
-void sampleCell::setPoints(ofPoint oldP0, ofPoint oldP1){
-    bSettingPoints = true;
-    secondSet = true;
-    if(!bRegisteredEvents) {
-        ofRegisterMouseEvents(this); // this will enable our circle class to listen to the mouse events.
-        bRegisteredEvents = true;
-    }
-   
-    p0 = oldP0;
-    p1 = oldP1;
-    shape.addVertex(p0);
-    shape.addVertex(p1);
-    int increment = 2;
-    ofLogVerbose() << "setPoints " << ID << " started with two points";
-    ofLogVerbose() << "cell: " << ID << " point 0 is: " << p0.x << " " << p0.y;
-    ofLogVerbose() << "cell: " << ID << " point 1 is: " << p1.x << " " << p1.y;
-    ofLogVerbose() << "cell: " << ID << " increment is: " << increment;
-
-}
-
-//--------------------------------------------------------------
-void sampleCell::setPointsFirst(){
-   
-    bSettingPoints = true;
-    secondSet = false;
-    if(!bRegisteredEvents) {
-        ofRegisterMouseEvents(this); // this will enable our circle class to listen to the mouse events.
-        bRegisteredEvents = true;
-    }
-    ofLogVerbose() << "i am here!";
-    int increment = 0;
-    ofLogVerbose() << "setPoints " << ID << " started empty";
-}
 
 //--------------------------------------------------------------
 void sampleCell::draw(int alphaCoeff){
@@ -115,11 +131,13 @@ void sampleCell::draw(int alphaCoeff){
     if(bIsSet){
         ofSetColor(255,0,0, alpha);
         ofBeginShape();
-            ofVertex(p0);
-            ofVertex(p1);
-            ofVertex(p2);
-            ofVertex(p3);
+            ofVertex(p[0]);
+            ofVertex(p[1]);
+            ofVertex(p[2]);
+            ofVertex(p[3]);
         ofEndShape();
+        
+        
         
     }
     
@@ -130,22 +148,20 @@ void sampleCell::draw(int alphaCoeff){
     
 }
 
+/*
 //--------------------------------------------------------------
 void sampleCell::reset(){
     shape.clear();
     ofLogVerbose() << "ID: " << ID << " is RESET";
-    increment = 0;
     bIsSet = false;
-    setPointsFirst();
+    //setPointsFirst();
 }
-
+*/
 
 //--------------------------------------------------------------
-void sampleCell::getPixLocations(const ofPixels &_pix, ofPoint _startPoint){
-    pix = _pix;
-    int startX = _startPoint.x;
-    int startY = _startPoint.y;
+void sampleCell::getPixLocations(){
     
+    //ofLog() << "number of pixels in PIX: " << pix.size();
     for(int x = 0; x < pix.getWidth(); x++)
     {
         for(int y = 0; y < pix.getHeight(); y++)
@@ -165,18 +181,22 @@ void sampleCell::getPixLocations(const ofPixels &_pix, ofPoint _startPoint){
 int sampleCell::getCellAvg(const ofPixels &_pix){
     pix = _pix;
     
-    for(int i = 0; i < pixIn.size(); i++)
+    //if pixIn is not empty
+    if(pixIn.size() > 0)
     {
-        //ofLogVerbose() << "cell: " << ID << ", Value of pixel " << pixIn[i] << ": " << (int)pix[pixIn[i]];
-        
-        total = total + (int)pix[pixIn[i]];
-    }
+        for(int i = 0; i < pixIn.size(); i++)
+        {
+            total = total + (int)pix[pixIn[i]];
+        }
     
-    average = total / pixIn.size();
-    total = 0;
-    ofLogVerbose() << "average of cell " << ID << ": " << average;
+        average = total / pixIn.size();
+        total = 0;
+    }
+    //ofLogVerbose() << "average of cell " << ID << ": " << average;
     return average;
 }
+
+
 
 //--------------------------------------------------------------
 bool sampleCell::isPointsSet(){
@@ -194,7 +214,6 @@ void sampleCell::mouseDragged(ofMouseEventArgs & args){}
 void sampleCell::mousePressed(ofMouseEventArgs & args){
     tempPoint.x = args.x;
     tempPoint.y = args.y;
-    ofLogVerbose() << "JUST CLICKED cell: " << ID << " increment is: " << increment;
     addPoint();
 }
 void sampleCell::mouseReleased(ofMouseEventArgs & args){}
