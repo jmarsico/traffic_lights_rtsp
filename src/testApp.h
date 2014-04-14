@@ -42,6 +42,8 @@ public:
     ofVideoGrabber grabber;
     ofPixels grabPix;
     
+    ofPoint start;
+    
     
     ofxPanel gui;
     ofxButton bLoadCells;

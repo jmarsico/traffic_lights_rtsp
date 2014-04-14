@@ -104,7 +104,7 @@ void testApp::update(){
     }
     
     //set up a starting point for cells[] array
-    ofPoint start;
+
     if(!bUseLocalVid)start.set(rtsp.getWidth()+10,0);
     if(bUseLocalVid)start.set(grabber.getWidth()+10,0);
 
@@ -249,7 +249,7 @@ void testApp::loadCellsFromXml(){
         for(int i = 0; i < numLEDs; i++)
         {
             myXML.pushTag("CELL", i);
-            cells[i].bSettingPoints = true;
+            cells[i].setPointsFirst(threshPix, start);
             
             for(int j = 0; j < 4; j++)
             {
@@ -265,7 +265,9 @@ void testApp::loadCellsFromXml(){
                 ofLogVerbose() << "loadFromXML: cell[" << i << "]: point.x = " << x;
                 ofLogVerbose() << "loadFromXML: cell[" << i << "]: point.y = " << y;
             }
-
+            cells[i].bSettingPoints = false;
+            cells[i].bIsSet = true;
+            cells[i].getPixLocations();
             myXML.popTag();
         }
     

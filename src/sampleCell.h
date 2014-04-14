@@ -33,6 +33,7 @@ public:
     bool isPointsSet();
     bool isSettingPoints();
     void addPoint();
+    void setPixIn(const ofPixels &_pix);
     
     int getCellAvg(const ofPixels &_pix);
     int total;
@@ -47,13 +48,13 @@ public:
     void mouseDragged(ofMouseEventArgs & args);
     void mousePressed(ofMouseEventArgs & args);
     void mouseReleased(ofMouseEventArgs & args);
-  
+  bool bIsSet;
     
     
 protected:
     
     bool bRegisteredEvents;
-    bool bIsSet;
+    
     int increment;
     int average;
     int alpha;

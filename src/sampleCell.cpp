@@ -46,6 +46,10 @@ void sampleCell::setPoints(ofPoint oldP0, ofPoint oldP1, const ofPixels &_pix, o
 
 }
 
+void sampleCell::setPixIn(const ofPixels &_pix){
+    pix = _pix;
+}
+
 //--------------------------------------------------------------
 void sampleCell::setPointsFirst(const ofPixels &_pix, ofPoint _startPoint){
     pix = _pix;
