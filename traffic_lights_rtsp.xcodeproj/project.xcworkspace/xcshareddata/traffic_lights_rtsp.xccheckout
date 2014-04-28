@@ -14,6 +14,8 @@
 		<string>https://github.com/kylemcdonald/ofxCv.git</string>
 		<key>A539F48F-0B27-4715-8018-73D3E06466ED</key>
 		<string>https://github.com/jmarsico/traffic_lights_rtsp.git</string>
+		<key>C6B9D548-0A70-4BFF-B43F-4FCD9EAC71B7</key>
+		<string>https://github.com/arturoc/ofxTween.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>traffic_lights_rtsp.xcodeproj/project.xcworkspace</string>
@@ -23,6 +25,8 @@
 		<string>../../../../../addons/ofxCv</string>
 		<key>A539F48F-0B27-4715-8018-73D3E06466ED</key>
 		<string>../..</string>
+		<key>C6B9D548-0A70-4BFF-B43F-4FCD9EAC71B7</key>
+		<string>../../../../../addons/ofxTween</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/jmarsico/traffic_lights_rtsp.git</string>
@@ -39,6 +43,14 @@
 			<string>3AB241D0-6E49-44FE-BC06-B2517F93977C</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ofxCv</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>C6B9D548-0A70-4BFF-B43F-4FCD9EAC71B7</string>
+			<key>IDESourceControlWCCName</key>
+			<string>ofxTween</string>
 		</dict>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>

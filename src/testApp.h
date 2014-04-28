@@ -6,6 +6,7 @@
 #include "ofEvents.h"
 #include "sampleCell.h"
 #include "ofxXmlSettings.h"
+#include "ofxNetwork.h"
 
 
 class testApp : public ofBaseApp{
@@ -27,10 +28,12 @@ public:
 
     void loadCellsFromXml();
     void saveCellsToXml();
-
-    //ofVideoGrabber grabber;
-    //ofImage greyImage;
-    vector <int> brights;
+    void sendLights();
+    
+    
+    static const int numLEDs = 10;
+    vector <int> brightVals;
+    //int avgBrights[numLEDs][5];
     
     ofQTKitPlayer rtsp;
     ofPixels rtspPix;
@@ -44,6 +47,16 @@ public:
     
     ofPoint start;
     
+    bool bIsSetting;
+    bool bShowVideo;
+   
+    
+    sampleCell cells[numLEDs];
+    
+    ofxXmlSettings myXML;
+    ofxUDPManager udpConnection;
+    
+    
     
     ofxPanel gui;
     ofxButton bLoadCells;
@@ -55,17 +68,7 @@ public:
     ofxToggle bLinkCells;
     ofxToggle bUseLocalVid;
     ofxIntSlider boxSize;
-    
-    
-    bool bIsSetting;
-    bool bShowVideo;
-   // bool bGetPix;
-    
-    static const int numLEDs = 10;
-    
-    //states
-    sampleCell cells[numLEDs];
-    
-    ofxXmlSettings myXML;
+    ofxFloatSlider lightAmp;
+    ofxIntSlider avgAmt;
 
 };

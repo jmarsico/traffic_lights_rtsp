@@ -1,3 +1,19 @@
+
+
+
+
+
+
+/*TODO: 
+ - averaging light value
+ - save settings
+ -
+ 
+ 
+ 
+ */
+
+
 #include "testApp.h"
 
 //--------------------------------------------------------------
@@ -5,6 +21,7 @@ void testApp::setup(){
     ofBackground(0);
     ofEnableAlphaBlending();
     ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetFrameRate(20);
 
     
     ////////set up the gui
@@ -18,15 +35,17 @@ void testApp::setup(){
     gui.add(bLinkCells.setup("Link Cells", true));
     gui.add(boxSize.setup("boxSize", 91, 10, 100));
     gui.add(bUseLocalVid.setup("use this camera", false));
+    gui.add(lightAmp.setup("gain", 1.5, 0.5, 4.0));
+    gui.add(avgAmt.setup("amt of avg", 5, 1, 1000));
     gui.setPosition(330, 290);
     
     
     ////////initialize the LED value vector
     for(int i = 0; i < numLEDs; i++)
     {
-        brights.push_back(0);
+        brightVals.push_back(0);
     }
-    ofLog() << "size of brights array: " << brights.size();
+    ofLog() << "size of brightVals array: " << brightVals.size();
     
     ////////set upt he RTSP feed
     // MD feeds: http://www.chart.state.md.us/TravInfo/trafficcams.php#
@@ -35,7 +54,7 @@ void testApp::setup(){
     ofLog() << "size: " << rtsp.getWidth() << " " << rtsp.getHeight();
     
     //////////set up the videograbber
-    grabber.initGrabber(320, 240);
+    //grabber.initGrabber(320, 240);
     
     
     //////////set up the array of LEDs
@@ -57,6 +76,12 @@ void testApp::setup(){
     }else{
         ofLog() << "XML did not load, check data/ folder";
     }
+    
+    
+    //create the socket and set to send to 169.254.0.2:11999
+	udpConnection.Create();
+	udpConnection.Connect("169.254.0.2",11999);
+	udpConnection.SetNonBlocking(true);
 }
 
 //--------------------------------------------------------------
@@ -144,12 +169,14 @@ void testApp::update(){
         }
     }
     
+    int averageAmount = avgAmt;
     
     //if a cell is set, go ahead and start getting its brightness
     for(int i = 0; i < numLEDs; i++)
     {
         if(cells[i].isPointsSet()){
-            brights[i] = cells[i].getCellAvg(threshPix);
+            cells[i].getCellBrightness(threshPix);
+            brightVals[i] = cells[i].getAverageBrightness(averageAmount);
         }
     }
     
@@ -163,6 +190,8 @@ void testApp::update(){
         loadCellsFromXml();
     }
     
+    
+    sendLights();
 }
 
 //--------------------------------------------------------------
@@ -219,7 +248,7 @@ void testApp::draw(){
         {
             ofPushMatrix();
                 ofTranslate(boxSize*i, 0);
-                ofSetColor(brights[i]);
+                ofSetColor(brightVals[i]);
                 ofRect(0,0,boxSize, boxSize);
                 ofSetColor(255);
                 ofDrawBitmapString(ofToString(i), 0,0);
@@ -240,37 +269,32 @@ void testApp::draw(){
 void testApp::loadCellsFromXml(){
    
     ofLog() << "Starting to Load cells from XML...";
-    
-   // int numCellTags = myXML.getNumTags("POINTS:CELL");
-    //ofLog() << "number of cell tags: " << numCellTags;
-    
-    //if(numCellTags > 0)
-    
-        for(int i = 0; i < numLEDs; i++)
+ 
+    for(int i = 0; i < numLEDs; i++)
+    {
+        myXML.pushTag("CELL", i);
+        cells[i].setPointsFirst(threshPix, start);
+        
+        for(int j = 0; j < 4; j++)
         {
-            myXML.pushTag("CELL", i);
-            cells[i].setPointsFirst(threshPix, start);
             
-            for(int j = 0; j < 4; j++)
-            {
-                
-                int x = myXML.getValue("PT:X", 0, j);
-                int y = myXML.getValue("PT:Y", 0, j);
-                
-                //set it to the points of that cell and add to the polyline
-                
-                cells[i].tempPoint.x = x;
-                cells[i].tempPoint.y = y;
-                cells[i].addPoint();
-                ofLogVerbose() << "loadFromXML: cell[" << i << "]: point.x = " << x;
-                ofLogVerbose() << "loadFromXML: cell[" << i << "]: point.y = " << y;
-            }
-            cells[i].bSettingPoints = false;
-            cells[i].bIsSet = true;
-            cells[i].getPixLocations();
-            myXML.popTag();
+            int x = myXML.getValue("PT:X", 0, j);
+            int y = myXML.getValue("PT:Y", 0, j);
+            
+            //set it to the points of that cell and add to the polyline
+            
+            cells[i].tempPoint.x = x;
+            cells[i].tempPoint.y = y;
+            cells[i].addPoint();
+            ofLogVerbose() << "loadFromXML: cell[" << i << "]: point.x = " << x;
+            ofLogVerbose() << "loadFromXML: cell[" << i << "]: point.y = " << y;
         }
-    
+        
+        cells[i].bSettingPoints = false;
+        cells[i].bIsSet = true;
+        cells[i].getPixLocations();
+        myXML.popTag();
+    }
 }
 
 //--------------------------------------------------------------
@@ -309,14 +333,36 @@ void testApp::saveCellsToXml(){
     myXML.save("cellPoints.xml");
 }
 
+
+//////////////////////////// RUN LIGHTS //////////////////////////////////
+void testApp::sendLights(){
+    
+    
+    
+    
+    string message = "";
+    for(int i = 0; i < numLEDs; i++)
+    {
+        brightVals[i] = (int)(brightVals[i]*lightAmp);
+        if(brightVals[i] > 255)
+        {
+            brightVals[i] = 255;
+        }
+        
+        message+= ofToString(i) + "|" + ofToString(brightVals[i]) + "[/p]";
+        //ofLog() << "index: " << i << " || value: " << brightVals[i];
+    }
+    udpConnection.Send(message.c_str(),message.length());
+    //ofLog() << "Message Length: " << message.length();
+    
+    
+}
+
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
     if(key == ' '){
         bShowVideo = !bShowVideo;
     }
-    
-    
-
 }
 
 

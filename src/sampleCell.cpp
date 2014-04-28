@@ -18,6 +18,17 @@ void sampleCell::init(int _ID){
     ofLogVerbose() << "cell initialized";
     ID = _ID;
     total = 0;
+    
+    avgCounter = 0;
+    
+    numSamples = 5;
+    
+    for(int i = 0; i < numSamples; i++)
+    {
+        average.push_back(0);
+    }
+    
+
 }
 
 
@@ -147,7 +158,7 @@ void sampleCell::draw(int alphaCoeff){
     
     ofSetColor(0, 255, 0);
     shape.draw();
-    ofDrawBitmapString(ofToString(average), shape.getCentroid2D().x, shape.getCentroid2D().y);
+    ofDrawBitmapString(ofToString(brightness), shape.getCentroid2D().x, shape.getCentroid2D().y);
     
     
 }
@@ -182,7 +193,7 @@ void sampleCell::getPixLocations(){
 }
 
 //--------------------------------------------------------------
-int sampleCell::getCellAvg(const ofPixels &_pix){
+int sampleCell::getCellBrightness(const ofPixels &_pix){
     pix = _pix;
     
     //if pixIn is not empty
@@ -193,11 +204,11 @@ int sampleCell::getCellAvg(const ofPixels &_pix){
             total = total + (int)pix[pixIn[i]];
         }
     
-        average = total / pixIn.size();
+        brightness = total / pixIn.size();
         total = 0;
     }
-    //ofLogVerbose() << "average of cell " << ID << ": " << average;
-    return average;
+    //ofLogVerbose() << "brightness of cell " << ID << ": " << brightness;
+    return brightness;
 }
 
 
@@ -210,6 +221,74 @@ bool sampleCell::isPointsSet(){
 //--------------------------------------------------------------
 bool sampleCell::isSettingPoints(){
     return bSettingPoints;
+}
+
+
+//--------------------------------------------------------------
+int sampleCell::getAverageBrightness(int _numSamples){
+    
+    
+
+    numSamples = _numSamples;
+
+
+    //remove old reading
+    runningTotal = runningTotal - average[avgCounter];
+    
+    //set that lcoation to newest value
+    average[avgCounter] = brightness;
+    
+    //add the newest reading
+    runningTotal += average[avgCounter];
+    
+    //increment the counter (location in vector)
+    avgCounter++;
+    
+
+
+    if(avgCounter >= average.size()-1)
+    {
+        avgCounter = 0;
+    }
+    
+    if(numSamples != average.size())
+    {
+        
+        average.clear();
+        runningTotal = 0;
+        
+        //runningTotal = 0;
+        while(numSamples > average.size())
+        {
+    
+            average.push_back(brightness);
+        }
+        
+        while(average.size() > numSamples)
+        {
+            average.pop_back();
+        }
+    }
+    
+    
+    if(runningTotal < 0)
+    {
+        runningTotal = 0;
+    }
+    
+    
+    int avge = (int)(runningTotal / average.size());
+    
+    if(avge > 255)
+    {
+        avge = 255;
+    }
+
+    ofLogVerbose() << "ID: " << ID <<  ": numSamples: " << average.size() << " runningTotal: " << runningTotal
+    << " average: " << avge;
+    
+    
+    return avge;
 }
 
 //--------------------------------------------------------------

@@ -34,8 +34,10 @@ public:
     bool isSettingPoints();
     void addPoint();
     void setPixIn(const ofPixels &_pix);
+    int getCellBrightness(const ofPixels &_pix);
+    int getAverageBrightness(int _numSamples);
     
-    int getCellAvg(const ofPixels &_pix);
+    
     int total;
     ofPixels pix;
     int startX;
@@ -48,7 +50,7 @@ public:
     void mouseDragged(ofMouseEventArgs & args);
     void mousePressed(ofMouseEventArgs & args);
     void mouseReleased(ofMouseEventArgs & args);
-  bool bIsSet;
+    bool bIsSet;
     
     
 protected:
@@ -56,9 +58,17 @@ protected:
     bool bRegisteredEvents;
     
     int increment;
-    int average;
+    int brightness;
     int alpha;
     bool secondSet;
+    
+    vector <int> average;
+    
+    int avgCounter;
+    int runningTotal;
+    int numSamples;
+    
+    
 };
 
 
