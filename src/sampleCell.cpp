@@ -226,11 +226,8 @@ bool sampleCell::isSettingPoints(){
 
 //--------------------------------------------------------------
 int sampleCell::getAverageBrightness(int _numSamples){
-    
-    
 
     numSamples = _numSamples;
-
 
     //remove old reading
     runningTotal = runningTotal - average[avgCounter];
@@ -243,8 +240,6 @@ int sampleCell::getAverageBrightness(int _numSamples){
     
     //increment the counter (location in vector)
     avgCounter++;
-    
-
 
     if(avgCounter >= average.size()-1)
     {
@@ -260,7 +255,6 @@ int sampleCell::getAverageBrightness(int _numSamples){
         //runningTotal = 0;
         while(numSamples > average.size())
         {
-    
             average.push_back(brightness);
         }
         
@@ -270,24 +264,12 @@ int sampleCell::getAverageBrightness(int _numSamples){
         }
     }
     
-    
-    if(runningTotal < 0)
-    {
-        runningTotal = 0;
-    }
-    
-    
+    if(runningTotal < 0) runningTotal = 0;
     int avge = (int)(runningTotal / average.size());
-    
-    if(avge > 255)
-    {
-        avge = 255;
-    }
+    if(avge > 255) avge = 255;
 
-    ofLogVerbose() << "ID: " << ID <<  ": numSamples: " << average.size() << " runningTotal: " << runningTotal
-    << " average: " << avge;
-    
-    
+    //ofLogVerbose() << "ID: " << ID <<  ": numSamples: " << average.size() << " runningTotal: " << runningTotal << " average: " << avge;
+
     return avge;
 }
 

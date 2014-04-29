@@ -1,15 +1,6 @@
+/*TODO:
 
-
-
-
-
-
-/*TODO: 
- - averaging light value
- - save settings
- -
- 
- 
+ - overlay binary mask on video
  
  */
 
@@ -33,11 +24,13 @@ void testApp::setup(){
     gui.add(reset.setup("reset background"));
     gui.add(bReady.setup("ready", false));
     gui.add(bLinkCells.setup("Link Cells", true));
-    gui.add(boxSize.setup("boxSize", 91, 10, 100));
+    //gui.add(boxSize.setup("boxSize", 91, 10, 100));
     gui.add(bUseLocalVid.setup("use this camera", false));
-    gui.add(lightAmp.setup("gain", 1.5, 0.5, 4.0));
-    gui.add(avgAmt.setup("amt of avg", 5, 1, 1000));
-    gui.setPosition(330, 290);
+    gui.add(lightAmp.setup("gain", 1.5, 0.5, 10.0));
+    gui.add(avgAmt.setup("amt of avg", 5, 1, 100));
+    gui.add(bShowBinaryMask.setup("show binaryMask", false));
+    gui.setPosition(330, 0);
+    gui.loadFromFile("settings.xml");
     
     
     ////////initialize the LED value vector
@@ -47,17 +40,15 @@ void testApp::setup(){
     }
     ofLog() << "size of brightVals array: " << brightVals.size();
     
+    
+    
     ////////set upt he RTSP feed
     // MD feeds: http://www.chart.state.md.us/TravInfo/trafficcams.php#
     rtsp.loadMovie("rtsp://170.93.143.140:1935/rtplive/2300899400e40039004606363d235daa", OF_QTKIT_DECODE_PIXELS_AND_TEXTURE, true);
     rtsp.play();
     ofLog() << "size: " << rtsp.getWidth() << " " << rtsp.getHeight();
     
-    //////////set up the videograbber
-    //grabber.initGrabber(320, 240);
-    
-    
-    //////////set up the array of LEDs
+    //////////initialize all the cells
     for(int i = 0; i < numLEDs; i++)
     {
         cells[i].init(i);
@@ -66,7 +57,6 @@ void testApp::setup(){
     
     bIsSetting = true;
     bShowVideo = true;
-    
     
     
     ////////set up XML for points access
@@ -91,17 +81,13 @@ void testApp::update(){
     background.setLearningTime(learningTime);
     background.setThresholdValue(backgroundThresh);
     
-    if(bLoadCells)
-    {
-        loadCellsFromXml();
-    }
+    //load cells
+    if(bSaveCells) saveCellsToXml();
+    if(bLoadCells) loadCellsFromXml();
     
     //reset background
-    if(reset)
-    {
-        background.reset();
-    }
-    
+    if(reset) background.reset();
+
     //use rtsp
     if( !bUseLocalVid )
     {
@@ -129,9 +115,8 @@ void testApp::update(){
     }
     
     //set up a starting point for cells[] array
-
-    if(!bUseLocalVid)start.set(rtsp.getWidth()+10,0);
-    if(bUseLocalVid)start.set(grabber.getWidth()+10,0);
+    if(!bUseLocalVid)start.set(0,0);
+    if(bUseLocalVid)start.set(0,0);
 
     
     
@@ -170,7 +155,6 @@ void testApp::update(){
     }
     
     int averageAmount = avgAmt;
-    
     //if a cell is set, go ahead and start getting its brightness
     for(int i = 0; i < numLEDs; i++)
     {
@@ -179,17 +163,6 @@ void testApp::update(){
             brightVals[i] = cells[i].getAverageBrightness(averageAmount);
         }
     }
-    
-    if(bSaveCells)
-    {
-        saveCellsToXml();
-    }
-    
-    if(bLoadCells)
-    {
-        loadCellsFromXml();
-    }
-    
     
     sendLights();
 }
@@ -210,11 +183,8 @@ void testApp::draw(){
                 rtspReport
                 << "width: " << rtsp.getWidth() << endl
                 << "height: " << rtsp.getHeight() << endl
-                << "speed: " << rtsp.getSpeed() << endl
-                << "numPix" << rtspPix.size() << endl
                 << "framerate: " << ofGetFrameRate() << endl;
-            
-                ofDrawBitmapString(rtspReport.str(), 0, 300);
+                ofDrawBitmapString(rtspReport.str(), 0, rtsp.getHeight()+10);
             }
         
             else if(bUseLocalVid)
@@ -224,26 +194,36 @@ void testApp::draw(){
                 rtspReport
                 << "width: " << grabber.getWidth() << endl
                 << "height: " << grabber.getHeight() << endl
-                //<< "speed: " << grabber.getSpeed() << endl
-                << "numPix: " << grabPix.size() << endl
                 << "framerate: " << ofGetFrameRate() << endl;
                 
                 ofDrawBitmapString(rtspReport.str(), 0, 300);
             }
-
         ofPopMatrix();
         
-        ofPushMatrix();
-            if(!bUseLocalVid) ofTranslate(rtsp.getWidth()+10, 0);
-            else if(bUseLocalVid) ofTranslate(grabber.getWidth()+10, 0);
-            thresholded.draw(0,0);
-        ofPopMatrix();
-            
+        
+        if(bShowBinaryMask)
+        {
+            ofPushMatrix();
+                if(!bUseLocalVid) ofTranslate(0, 0);
+                else if(bUseLocalVid) ofTranslate(0, 0);
+                thresholded.draw(0,0);
+            ofPopMatrix();
+        }
+        
+        //draw the cells
+        for(int i = 0; i < numLEDs; i++)
+        {
+            cells[i].draw(i);
+        }
+        
+        
     }
+    
+    int boxSize = ofGetWidth() / (numLEDs + 1);
     
     //draw boxes
     ofPushMatrix();
-        ofTranslate(boxSize, ofGetHeight()-boxSize - 90);
+        ofTranslate(boxSize/2, ofGetHeight()-boxSize - 20);
         for(int i = 0; i < numLEDs; i++)
         {
             ofPushMatrix();
@@ -257,12 +237,7 @@ void testApp::draw(){
         }
     ofPopMatrix();
     
-    //draw the cells
-    for(int i = 0; i < numLEDs; i++)
-    {
-        cells[i].draw(i);
-    }
-        
+    
 }
 
 //--------------------------------------------------------------

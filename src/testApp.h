@@ -31,7 +31,7 @@ public:
     void sendLights();
     
     
-    static const int numLEDs = 10;
+    static const int numLEDs = 8;
     vector <int> brightVals;
     //int avgBrights[numLEDs][5];
     
@@ -67,8 +67,9 @@ public:
     ofxToggle bReady;
     ofxToggle bLinkCells;
     ofxToggle bUseLocalVid;
-    ofxIntSlider boxSize;
+   // ofxIntSlider boxSize;
     ofxFloatSlider lightAmp;
     ofxIntSlider avgAmt;
+    ofxToggle bShowBinaryMask;
 
 };

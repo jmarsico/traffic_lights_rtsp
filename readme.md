@@ -18,10 +18,7 @@ The modification allows the video window to resize when the rtsp feed resizes. T
 
 ####To Do:
 - allow re-sizing of cell polygons
-- automate pixel-index capture with each cell
-- automate cell averaging with each cell
-- fix issue with "second setPoints() function
 - comment everything
-- add ofxSerial or ofxArduino to send LED values
-- write serial->i2c code for sending values to custom LED driver
 - improve GUI
+- overlay binary mask on top of video, so you can draw cells on video
+- more tools!

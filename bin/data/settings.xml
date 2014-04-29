@@ -1,9 +1,12 @@
 <group>
-	<bgThresh>21</bgThresh>
+	<bgThresh>42</bgThresh>
 	<learnTime>50</learnTime>
-	<ready>0</ready>
+	<ready>1</ready>
 	<Link_Cells>1</Link_Cells>
-	<boxSize>91</boxSize>
+	<boxSize>100</boxSize>
 	<use_this_camera>0</use_this_camera>
 <group/>
+<gain>2.775</gain>
+	<amt_of_avg>11</amt_of_avg>
+<show_binaryMask>0</show_binaryMask>
 </group>
