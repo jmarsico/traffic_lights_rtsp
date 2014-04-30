@@ -163,15 +163,16 @@ void sampleCell::draw(int alphaCoeff){
     
 }
 
-/*
+
 //--------------------------------------------------------------
 void sampleCell::reset(){
     shape.clear();
-    ofLogVerbose() << "ID: " << ID << " is RESET";
+    p.clear();
     bIsSet = false;
-    //setPointsFirst();
+    ofLogVerbose() << "ID: " << ID << " is RESET";
+    bSettingPoints = false;
 }
-*/
+
 
 //--------------------------------------------------------------
 void sampleCell::getPixLocations(){

@@ -64,10 +64,10 @@ public:
     ofxIntSlider backgroundThresh;
     ofxIntSlider learningTime;
     ofxButton reset;
+    ofxButton cellReset;
     ofxToggle bReady;
     ofxToggle bLinkCells;
     ofxToggle bUseLocalVid;
-   // ofxIntSlider boxSize;
     ofxFloatSlider lightAmp;
     ofxIntSlider avgAmt;
     ofxToggle bShowBinaryMask;

@@ -19,16 +19,18 @@ void testApp::setup(){
     gui.setup();
     gui.add(bLoadCells.setup("Load Cells"));
     gui.add(bSaveCells.setup("Save Cells"));
-    gui.add(backgroundThresh.setup("bgThresh", 21, 0, 255));
-    gui.add(learningTime.setup("learnTime", 50, 30, 2000));
-    gui.add(reset.setup("reset background"));
-    gui.add(bReady.setup("ready", false));
+    gui.add(cellReset.setup("Clear Cells"));
+    gui.add(bShowBinaryMask.setup("show binaryMask", false));
+    gui.add(reset.setup("Reset Background"));
+    gui.add(backgroundThresh.setup("Background Threshold", 21, 0, 255));
+    gui.add(learningTime.setup("LearnvTime", 50, 30, 2000));
+    gui.add(bReady.setup("Ready for Cells", false));
     gui.add(bLinkCells.setup("Link Cells", true));
     //gui.add(boxSize.setup("boxSize", 91, 10, 100));
-    gui.add(bUseLocalVid.setup("use this camera", false));
-    gui.add(lightAmp.setup("gain", 1.5, 0.5, 10.0));
-    gui.add(avgAmt.setup("amt of avg", 5, 1, 100));
-    gui.add(bShowBinaryMask.setup("show binaryMask", false));
+    //gui.add(bUseLocalVid.setup("use this camera", false));
+    gui.add(lightAmp.setup("Gain", 1.5, 0.5, 10.0));
+    gui.add(avgAmt.setup("Smoothing", 5, 1, 100));
+    
     gui.setPosition(330, 0);
     gui.loadFromFile("settings.xml");
     
@@ -87,6 +89,17 @@ void testApp::update(){
     
     //reset background
     if(reset) background.reset();
+    
+    if(cellReset)
+    {
+        for(int i = 0; i < numLEDs; i ++)
+        {
+            cells[i].reset();
+            cells[i].init(i);
+            brightVals[i] = 0;
+        }
+        bReady = false;
+    }
 
     //use rtsp
     if( !bUseLocalVid )
