@@ -31,19 +31,19 @@ public:
     void sendLights();
     
     
-    static const int numLEDs = 8;
+    static const int numLEDs = 20;
     vector <int> brightVals;
     //int avgBrights[numLEDs][5];
     
-    ofQTKitPlayer rtsp;
-    ofImage rtspPix;
+    //ofQTKitPlayer rtsp;
+    //ofImage rtspPix;
   
     ofxCv::RunningBackground background;
     ofImage thresholded;
     ofPixels threshPix;
     
     ofVideoGrabber grabber;
-    ofPixels grabPix;
+    ofImage grabPix;
     
     ofPoint start;
     

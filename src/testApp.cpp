@@ -18,8 +18,6 @@ void testApp::setup(){
     gui.add(learningTime.setup("LearnvTime", 50, 30, 2000));
     gui.add(bReady.setup("Ready for Cells", false));
     gui.add(bLinkCells.setup("Link Cells", true));
-    //gui.add(boxSize.setup("boxSize", 91, 10, 100));
-    //gui.add(bUseLocalVid.setup("use this camera", false));
     gui.add(lightAmp.setup("Gain", 1.5, 0.5, 10.0));
     gui.add(avgAmt.setup("Smoothing", 5, 1, 100));
     gui.add(frameRate.set("Framerate", 0));
@@ -27,6 +25,8 @@ void testApp::setup(){
     gui.setPosition(700, 0);
     gui.loadFromFile("settings.xml");
     
+    
+    grabber.initGrabber(320, 280);
     
     ////////initialize the LED value vector
     for(int i = 0; i < numLEDs; i++)
@@ -37,9 +37,13 @@ void testApp::setup(){
     
     ////////set upt he RTSP feed
     // MD feeds: http://www.chart.state.md.us/TravInfo/trafficcams.php#
-    rtsp.loadMovie("rtsp://170.93.143.140:1935/rtplive/eb0165ea044c0160004806363d235daa", OF_QTKIT_DECODE_PIXELS_AND_TEXTURE, true);
+    /*rtsp.loadMovie("rtsp://170.93.143.140:1935/rtplive/eb0165ea044c0160004806363d235daa", OF_QTKIT_DECODE_PIXELS_AND_TEXTURE, true);
     rtsp.play();
     ofLog() << "size: " << rtsp.getWidth() << " " << rtsp.getHeight();
+    
+     
+     */
+    
     
     //////////initialize all the cells
     for(int i = 0; i < numLEDs; i++)
@@ -89,16 +93,16 @@ void testApp::update(){
     //use rtsp
     if( !bUseLocalVid )
     {
-        rtsp.update();
-        if(rtsp.isFrameNew() && rtsp.getWidth() > 200)
+        grabber.update();
+        if(grabber.isFrameNew() && grabber.getWidth() > 200)
         {
-            rtspPix = rtsp.getPixelsRef();
-            rtspPix.resize(rtsp.getWidth() * 2, rtsp.getHeight()*2);
-            background.update(rtspPix, thresholded);
+            grabPix = grabber.getPixelsRef();
+            grabPix.resize(grabber.getWidth() * 2, grabber.getHeight()*2);
+            background.update(grabPix, thresholded);
             thresholded.update();
             threshPix = thresholded.getPixelsRef();
         }
-        else if (rtsp.getWidth() < 200)
+        else if (grabber.getWidth() < 200)
         {
             ofSetColor(255);
             ofDrawBitmapString("no data", 10,10);
@@ -167,7 +171,7 @@ void testApp::draw(){
         gui.draw();
         ofSetColor(255);
         
-        rtspPix.draw(0,0);
+        grabPix.draw(0,0);
         
         if(bShowBinaryMask)
         {
