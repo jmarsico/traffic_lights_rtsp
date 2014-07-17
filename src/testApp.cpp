@@ -1,10 +1,3 @@
-/*TODO:
-
- - overlay binary mask on video
- 
- */
-
-
 #include "testApp.h"
 
 //--------------------------------------------------------------
@@ -13,14 +6,13 @@ void testApp::setup(){
     ofEnableAlphaBlending();
     ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetFrameRate(20);
-
     
     ////////set up the gui
     gui.setup();
     gui.add(bLoadCells.setup("Load Cells"));
     gui.add(bSaveCells.setup("Save Cells"));
     gui.add(cellReset.setup("Clear Cells"));
-    gui.add(bShowBinaryMask.setup("show binaryMask", false));
+    gui.add(bShowBinaryMask.setup("Show Mask", false));
     gui.add(reset.setup("Reset Background"));
     gui.add(backgroundThresh.setup("Background Threshold", 21, 0, 255));
     gui.add(learningTime.setup("LearnvTime", 50, 30, 2000));
@@ -30,8 +22,9 @@ void testApp::setup(){
     //gui.add(bUseLocalVid.setup("use this camera", false));
     gui.add(lightAmp.setup("Gain", 1.5, 0.5, 10.0));
     gui.add(avgAmt.setup("Smoothing", 5, 1, 100));
+    gui.add(frameRate.set("Framerate", 0));
     
-    gui.setPosition(330, 0);
+    gui.setPosition(700, 0);
     gui.loadFromFile("settings.xml");
     
     
@@ -42,11 +35,9 @@ void testApp::setup(){
     }
     ofLog() << "size of brightVals array: " << brightVals.size();
     
-    
-    
     ////////set upt he RTSP feed
     // MD feeds: http://www.chart.state.md.us/TravInfo/trafficcams.php#
-    rtsp.loadMovie("rtsp://170.93.143.140:1935/rtplive/2300899400e40039004606363d235daa", OF_QTKIT_DECODE_PIXELS_AND_TEXTURE, true);
+    rtsp.loadMovie("rtsp://170.93.143.140:1935/rtplive/eb0165ea044c0160004806363d235daa", OF_QTKIT_DECODE_PIXELS_AND_TEXTURE, true);
     rtsp.play();
     ofLog() << "size: " << rtsp.getWidth() << " " << rtsp.getHeight();
     
@@ -56,19 +47,12 @@ void testApp::setup(){
         cells[i].init(i);
     }
     
-    
     bIsSetting = true;
     bShowVideo = true;
     
-    
     ////////set up XML for points access
-    if(myXML.load("cellPoints.xml")){
-        ofLog() << "XML loaded successfully";
-
-    }else{
-        ofLog() << "XML did not load, check data/ folder";
-    }
-    
+    if(myXML.load("cellPoints.xml")) ofLog() << "XML loaded successfully";
+    else ofLog() << "XML did not load, check data/ folder";
     
     //create the socket and set to send to 169.254.0.2:11999
 	udpConnection.Create();
@@ -78,6 +62,7 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
+    frameRate = ofGetFrameRate();
     
     //set background parameters from GUI
     background.setLearningTime(learningTime);
@@ -105,27 +90,21 @@ void testApp::update(){
     if( !bUseLocalVid )
     {
         rtsp.update();
-        if(rtsp.isFrameNew())
+        if(rtsp.isFrameNew() && rtsp.getWidth() > 200)
         {
             rtspPix = rtsp.getPixelsRef();
+            rtspPix.resize(rtsp.getWidth() * 2, rtsp.getHeight()*2);
             background.update(rtspPix, thresholded);
             thresholded.update();
             threshPix = thresholded.getPixelsRef();
         }
-    }
-    
-    //use webcam
-    else if( bUseLocalVid )
-    {
-        grabber.update();
-        if(grabber.isFrameNew())
+        else if (rtsp.getWidth() < 200)
         {
-            grabPix = grabber.getPixelsRef();
-            background.update(grabPix, thresholded);
-            thresholded.update();
-            threshPix = thresholded.getPixelsRef();
+            ofSetColor(255);
+            ofDrawBitmapString("no data", 10,10);
         }
     }
+    
     
     //set up a starting point for cells[] array
     if(!bUseLocalVid)start.set(0,0);
@@ -187,32 +166,8 @@ void testApp::draw(){
     if(bShowVideo){
         gui.draw();
         ofSetColor(255);
-       
-        ofPushMatrix();
-            if(!bUseLocalVid)
-            {
-                rtsp.draw(0,0);
-                stringstream rtspReport;
-                rtspReport
-                << "width: " << rtsp.getWidth() << endl
-                << "height: " << rtsp.getHeight() << endl
-                << "framerate: " << ofGetFrameRate() << endl;
-                ofDrawBitmapString(rtspReport.str(), 0, rtsp.getHeight()+10);
-            }
         
-            else if(bUseLocalVid)
-            {
-                grabber.draw(0, 0);
-                stringstream rtspReport;
-                rtspReport
-                << "width: " << grabber.getWidth() << endl
-                << "height: " << grabber.getHeight() << endl
-                << "framerate: " << ofGetFrameRate() << endl;
-                
-                ofDrawBitmapString(rtspReport.str(), 0, 300);
-            }
-        ofPopMatrix();
-        
+        rtspPix.draw(0,0);
         
         if(bShowBinaryMask)
         {
@@ -228,13 +183,11 @@ void testApp::draw(){
         {
             cells[i].draw(i);
         }
-        
-        
     }
     
-    int boxSize = ofGetWidth() / (numLEDs + 1);
     
     //draw boxes
+    int boxSize = ofGetWidth() / (numLEDs + 1);
     ofPushMatrix();
         ofTranslate(boxSize/2, ofGetHeight()-boxSize - 20);
         for(int i = 0; i < numLEDs; i++)
@@ -246,12 +199,11 @@ void testApp::draw(){
                 ofSetColor(255);
                 ofDrawBitmapString(ofToString(i), 0,0);
             ofPopMatrix();
-            
         }
     ofPopMatrix();
-    
-    
 }
+
+
 
 //--------------------------------------------------------------
 void testApp::loadCellsFromXml(){
@@ -270,7 +222,6 @@ void testApp::loadCellsFromXml(){
             int y = myXML.getValue("PT:Y", 0, j);
             
             //set it to the points of that cell and add to the polyline
-            
             cells[i].tempPoint.x = x;
             cells[i].tempPoint.y = y;
             cells[i].addPoint();
@@ -289,7 +240,6 @@ void testApp::loadCellsFromXml(){
 void testApp::saveCellsToXml(){
     myXML.clear();
 
-    
     for(int i = 0; i < numLEDs; i++)
     {
         if(cells[i].isPointsSet())
@@ -302,32 +252,22 @@ void testApp::saveCellsToXml(){
             //go through points
             for(int j = 0; j < cells[i].p.size(); j++)
             {
-
-
                 myXML.addTag("PT");
                 myXML.pushTag("PT", j);
                 myXML.setValue("X", cells[i].p[j].x);
                 myXML.setValue("Y", cells[i].p[j].y);
                 myXML.popTag();
-                
             }
             myXML.popTag();
-            
-         
         }
-        
     }
-    
     myXML.save("cellPoints.xml");
 }
 
 
 //////////////////////////// RUN LIGHTS //////////////////////////////////
 void testApp::sendLights(){
-    
-    
-    
-    
+   
     string message = "";
     for(int i = 0; i < numLEDs; i++)
     {
@@ -348,7 +288,8 @@ void testApp::sendLights(){
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
-    if(key == ' '){
+    if(key == ' ')
+    {
         bShowVideo = !bShowVideo;
     }
 }

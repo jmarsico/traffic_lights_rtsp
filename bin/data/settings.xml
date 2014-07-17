@@ -9,4 +9,11 @@
 <gain>2.775</gain>
 	<amt_of_avg>11</amt_of_avg>
 <show_binaryMask>0</show_binaryMask>
+<Background_Threshold>105</Background_Threshold>
+	<LearnvTime>50</LearnvTime>
+	<Ready_for_Cells>1</Ready_for_Cells>
+	<Gain>1.26</Gain>
+	<Smoothing>16</Smoothing>
+<Show_Mask>0</Show_Mask>
+	<Framerate>19.635</Framerate>
 </group>

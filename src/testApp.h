@@ -36,7 +36,7 @@ public:
     //int avgBrights[numLEDs][5];
     
     ofQTKitPlayer rtsp;
-    ofPixels rtspPix;
+    ofImage rtspPix;
   
     ofxCv::RunningBackground background;
     ofImage thresholded;
@@ -71,5 +71,6 @@ public:
     ofxFloatSlider lightAmp;
     ofxIntSlider avgAmt;
     ofxToggle bShowBinaryMask;
+    ofParameter<float> frameRate;
 
 };

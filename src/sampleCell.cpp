@@ -132,10 +132,7 @@ void sampleCell::addPoint(){
             getPixLocations();
             
         }
-        
     }
-    
-    
 }
 
 
@@ -151,16 +148,12 @@ void sampleCell::draw(int alphaCoeff){
             ofVertex(p[2]);
             ofVertex(p[3]);
         ofEndShape();
-        
-        
-        
     }
     
     ofSetColor(0, 255, 0);
     shape.draw();
     ofDrawBitmapString(ofToString(brightness), shape.getCentroid2D().x, shape.getCentroid2D().y);
-    
-    
+ 
 }
 
 
@@ -269,7 +262,6 @@ int sampleCell::getAverageBrightness(int _numSamples){
     int avge = (int)(runningTotal / average.size());
     if(avge > 255) avge = 255;
 
-    //ofLogVerbose() << "ID: " << ID <<  ": numSamples: " << average.size() << " runningTotal: " << runningTotal << " average: " << avge;
 
     return avge;
 }
