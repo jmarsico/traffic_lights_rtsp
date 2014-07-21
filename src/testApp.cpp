@@ -20,6 +20,8 @@ void testApp::setup(){
     gui.add(bLinkCells.setup("Link Cells", true));
     gui.add(lightAmp.setup("Gain", 1.5, 0.5, 10.0));
     gui.add(avgAmt.setup("Smoothing", 5, 1, 100));
+    gui.add(bSendOSC.setup("Send OSC", false));
+    gui.add(bSendUDP.setup("Send UDP", false));
     gui.add(frameRate.set("Framerate", 0));
     
     gui.setPosition(700, 0);
@@ -44,6 +46,7 @@ void testApp::setup(){
      
      */
     
+    sender.setup(HOST, PORT);
     
     //////////initialize all the cells
     for(int i = 0; i < numLEDs; i++)
@@ -59,9 +62,9 @@ void testApp::setup(){
     else ofLog() << "XML did not load, check data/ folder";
     
     //create the socket and set to send to 169.254.0.2:11999
-	udpConnection.Create();
-	udpConnection.Connect("169.254.0.2",11999);
-	udpConnection.SetNonBlocking(true);
+	//udpConnection.Create();
+	//udpConnection.Connect("169.254.0.2",11999);
+	//udpConnection.SetNonBlocking(true);
 }
 
 //--------------------------------------------------------------
@@ -160,7 +163,8 @@ void testApp::update(){
         }
     }
     
-    sendLights();
+    if(bSendUDP) sendLights();
+    if(bSendOSC) sendOSC();
 }
 
 //--------------------------------------------------------------
@@ -288,6 +292,23 @@ void testApp::sendLights(){
     //ofLog() << "Message Length: " << message.length();
     
     
+}
+
+
+///////////////////////// SEND OSC ///////////////////////////////////
+void testApp::sendOSC(){
+    ofxOscMessage m;
+    m.setAddress("/vals");
+    string printer;
+    
+    for(int i = 0; i < numLEDs; i++)
+    {
+		m.addIntArg(brightVals[i]);
+    
+    }
+    
+    sender.sendMessage(m);
+    ofLog() << "message: ";
 }
 
 //--------------------------------------------------------------

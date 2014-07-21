@@ -7,6 +7,10 @@
 #include "sampleCell.h"
 #include "ofxXmlSettings.h"
 #include "ofxNetwork.h"
+#include "ofxOsc.h"
+
+#define HOST "localhost"
+#define PORT 12345
 
 
 class testApp : public ofBaseApp{
@@ -29,6 +33,7 @@ public:
     void loadCellsFromXml();
     void saveCellsToXml();
     void sendLights();
+    void sendOSC();
     
     
     static const int numLEDs = 20;
@@ -56,6 +61,8 @@ public:
     ofxXmlSettings myXML;
     ofxUDPManager udpConnection;
     
+    ofxOscSender sender;
+    
     
     
     ofxPanel gui;
@@ -71,6 +78,8 @@ public:
     ofxFloatSlider lightAmp;
     ofxIntSlider avgAmt;
     ofxToggle bShowBinaryMask;
+    ofxToggle bSendUDP;
+    ofxToggle bSendOSC;
     ofParameter<float> frameRate;
 
 };
