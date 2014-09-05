@@ -18,15 +18,17 @@ void testApp::setup(){
     gui.add(learningTime.setup("LearnvTime", 50, 30, 2000));
     gui.add(bReady.setup("Ready for Cells", false));
     gui.add(bLinkCells.setup("Link Cells", true));
-    //gui.add(boxSize.setup("boxSize", 91, 10, 100));
-    //gui.add(bUseLocalVid.setup("use this camera", false));
     gui.add(lightAmp.setup("Gain", 1.5, 0.5, 10.0));
     gui.add(avgAmt.setup("Smoothing", 5, 1, 100));
-    gui.add(frameRate.set("Framerate", 0));
+    gui.add(bSendOSC.setup("Send OSC", false));
+    gui.add(bSendUDP.setup("Send UDP", false));
+    //gui.add(frameRate.set("Framerate", 0));
     
     gui.setPosition(700, 0);
     gui.loadFromFile("settings.xml");
     
+    
+    grabber.initGrabber(320, 280);
     
     ////////initialize the LED value vector
     for(int i = 0; i < numLEDs; i++)
@@ -40,6 +42,11 @@ void testApp::setup(){
     rtsp.loadMovie("rtsp://170.93.143.140:1935/rtplive/eb0165ea044c0160004806363d235daa", OF_QTKIT_DECODE_PIXELS_AND_TEXTURE, true);
     rtsp.play();
     ofLog() << "size: " << rtsp.getWidth() << " " << rtsp.getHeight();
+    
+     
+    
+    
+    sender.setup(HOST, PORT);
     
     //////////initialize all the cells
     for(int i = 0; i < numLEDs; i++)
@@ -56,7 +63,7 @@ void testApp::setup(){
     
     //create the socket and set to send to 169.254.0.2:11999
 	udpConnection.Create();
-	udpConnection.Connect("169.254.0.2",11999);
+	udpConnection.Connect("192.168.2.2",11999);
 	udpConnection.SetNonBlocking(true);
 }
 
@@ -156,34 +163,48 @@ void testApp::update(){
         }
     }
     
-    sendLights();
+    //amplify and constrain the brightVals if needed:
+    for(int i = 0; i < numLEDs; i++)
+    {
+        brightVals[i] = (int)(brightVals[i]*lightAmp);
+        if(brightVals[i] > 255)
+        {
+            brightVals[i] = 255;
+        }
+    }
+    
+    if(bSendUDP) sendLights();
+    if(bSendOSC) sendOSC();
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
     //ofBackground(0);
     
-    if(bShowVideo){
+    if(bShowVideo)
+    {
         gui.draw();
-        ofSetColor(255);
-        
-        rtspPix.draw(0,0);
-        
-        if(bShowBinaryMask)
-        {
-            ofPushMatrix();
-                if(!bUseLocalVid) ofTranslate(0, 0);
-                else if(bUseLocalVid) ofTranslate(0, 0);
-                thresholded.draw(0,0);
-            ofPopMatrix();
-        }
-        
-        //draw the cells
-        for(int i = 0; i < numLEDs; i++)
-        {
-            cells[i].draw(i);
-        }
     }
+    
+    ofSetColor(255);
+    
+    rtspPix.draw(0,0);
+    
+    if(bShowBinaryMask)
+    {
+        ofPushMatrix();
+            if(!bUseLocalVid) ofTranslate(0, 0);
+            else if(bUseLocalVid) ofTranslate(0, 0);
+            thresholded.draw(0,0);
+        ofPopMatrix();
+    }
+    
+    //draw the cells
+    for(int i = 0; i < numLEDs; i++)
+    {
+        cells[i].draw(i);
+    }
+    
     
     
     //draw boxes
@@ -271,12 +292,6 @@ void testApp::sendLights(){
     string message = "";
     for(int i = 0; i < numLEDs; i++)
     {
-        brightVals[i] = (int)(brightVals[i]*lightAmp);
-        if(brightVals[i] > 255)
-        {
-            brightVals[i] = 255;
-        }
-        
         message+= ofToString(i) + "|" + ofToString(brightVals[i]) + "[/p]";
         //ofLog() << "index: " << i << " || value: " << brightVals[i];
     }
@@ -284,6 +299,23 @@ void testApp::sendLights(){
     //ofLog() << "Message Length: " << message.length();
     
     
+}
+
+
+///////////////////////// SEND OSC ///////////////////////////////////
+void testApp::sendOSC(){
+    ofxOscMessage m;
+    m.setAddress("/vals");
+    string printer;
+    
+    for(int i = 0; i < numLEDs; i++)
+    {
+		m.addIntArg(brightVals[i]);
+    
+    }
+    
+    sender.sendMessage(m);
+    ofLog() << "message: ";
 }
 
 //--------------------------------------------------------------

@@ -9,11 +9,13 @@
 <gain>2.775</gain>
 	<amt_of_avg>11</amt_of_avg>
 <show_binaryMask>0</show_binaryMask>
-<Background_Threshold>105</Background_Threshold>
-	<LearnvTime>50</LearnvTime>
+<Background_Threshold>44</Background_Threshold>
+	<LearnvTime>30</LearnvTime>
 	<Ready_for_Cells>1</Ready_for_Cells>
-	<Gain>1.26</Gain>
+	<Gain>3.065</Gain>
 	<Smoothing>16</Smoothing>
 <Show_Mask>0</Show_Mask>
-	<Framerate>19.635</Framerate>
+	<Framerate>19.7203</Framerate>
+<Send_OSC>0</Send_OSC>
+	<Send_UDP>0</Send_UDP>
 </group>

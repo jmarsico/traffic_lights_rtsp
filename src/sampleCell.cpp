@@ -73,7 +73,7 @@ void sampleCell::setPointsFirst(const ofPixels &_pix, ofPoint _startPoint){
     }
     ofLog() << "*************************************************";
     ofLogVerbose() << "setPoints " << ID << " started empty";
-    ofLogVerbose() << "cell[" << ID << "] has pix: " << pix.size();
+    ofLogVerbose() << "cell[" << ID << "] has pix: " << _pix.size();
 }
 
 //--------------------------------------------------------------
@@ -170,7 +170,7 @@ void sampleCell::reset(){
 //--------------------------------------------------------------
 void sampleCell::getPixLocations(){
     
-    //ofLog() << "number of pixels in PIX: " << pix.size();
+    ofLog() << "number of pixels in PIX: " << pix.size();
     for(int x = 0; x < pix.getWidth(); x++)
     {
         for(int y = 0; y < pix.getHeight(); y++)
@@ -195,7 +195,7 @@ int sampleCell::getCellBrightness(const ofPixels &_pix){
     {
         for(int i = 0; i < pixIn.size(); i++)
         {
-            total = total + (int)pix[pixIn[i]];
+            total = total + (int)_pix[pixIn[i]];
         }
     
         brightness = total / pixIn.size();
@@ -264,6 +264,7 @@ int sampleCell::getAverageBrightness(int _numSamples){
 
 
     return avge;
+    ofLogVerbose() << "ID: " << ID << avge;
 }
 
 //--------------------------------------------------------------

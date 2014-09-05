@@ -14,14 +14,6 @@
 
 class sampleCell{
 public:
-    vector <ofPoint> p;
-    //p0, p1, p2, p3, tempPoint;
-    ofPoint tempPoint;
-    vector <int> pixIn;
-    int redVal;
-    ofPolyline shape;
-    int ID;
-    
     sampleCell();
     
     void init(int _ID);
@@ -36,7 +28,16 @@ public:
     void setPixIn(const ofPixels &_pix);
     int getCellBrightness(const ofPixels &_pix);
     int getAverageBrightness(int _numSamples);
+    void getPixLocations();
     
+
+    
+    vector <ofPoint> p;
+    ofPoint tempPoint;
+    vector <int> pixIn;
+    int redVal;
+    ofPolyline shape;
+    int ID;
     
     int total;
     ofPixels pix;
@@ -44,7 +45,7 @@ public:
     int startY;
     bool bSettingPoints;
     
-    void getPixLocations();
+    
     
     void mouseMoved(ofMouseEventArgs & args);
     void mouseDragged(ofMouseEventArgs & args);
